@@ -75,3 +75,17 @@ function(check_version major minor)
     set(${minor} ${MINOR_VERSION} PARENT_SCOPE)
 
 endfunction(check_version)
+
+
+function(report_version name ver)
+
+    if(NOT WIN32)
+      string(ASCII 27 Esc)
+      set(BoldYellow  "${Esc}[1;33m")
+      set(ColourReset "${Esc}[m")
+    endif()    
+        
+    message("- ${BoldYellow}${name} version ${ver}${ColourReset}")
+    
+endfunction()  
+

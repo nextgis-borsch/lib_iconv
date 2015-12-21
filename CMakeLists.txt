@@ -72,7 +72,7 @@ set(SRCS
     lib/iconv.c
 )
 
-message(STATUS "${PROJECT_NAME} version ${VERSION}")    
+report_version(${PROJECT_NAME} ${VERSION})     
 
 if(BUILD_SHARED_LIBS)
     set(LIB_NAME ${PROJECT_NAME})
