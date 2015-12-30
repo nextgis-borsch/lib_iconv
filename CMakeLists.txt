@@ -96,8 +96,7 @@ if(WIN32)
     endif()
 endif()
 
-add_definitions(-DIN_LIBRARY -DLIBICONV_PLUG)
-add_definitions(-DBUILDING_LIBICONV)
+add_definitions(-DIN_LIBRARY -DBUILDING_LIBICONV) # -DLIBICONV_PLUG
 
 report_version(${PROJECT_NAME} ${VERSION})     
 
