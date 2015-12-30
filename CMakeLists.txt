@@ -78,17 +78,21 @@ set(SRCS
 )
 
 if(WIN32)
-    set(SRCS ${SRCS} 
-        windows/libiconv.rc
-    )
-    
-    add_definitions(-DBUILDING_DLL)
-    if (MSVC)
-        add_definitions (-D_CRT_NONSTDC_NO_DEPRECATE -D_UNICODE -DUNICODE -D_CRT_SECURE_NO_WARNINGS -D_CRT_NON_CONFORMING_SWPRINTFS -D_CRT_SECURE_NO_DEPRECATE -DLIBDIR="")
+
+    if(BUILD_SHARED_LIBS)
+        set(SRCS ${SRCS} 
+            windows/libiconv.rc
+        )
+        add_definitions(-DBUILDING_DLL)
         add_definitions (-DPACKAGE_VERSION_MAJOR=${ICONV_MAJOR_VERSION})
         add_definitions (-DPACKAGE_VERSION_MINOR=${ICONV_MINOR_VERSION}) 
         add_definitions (-DPACKAGE_VERSION_SUBMINOR=0) 
-        add_definitions (-DPACKAGE_VERSION_STRING="lib${PROJECT_NAME}-${VERSION}")
+        add_definitions (-DPACKAGE_VERSION_STRING="lib${PROJECT_NAME}-${VERSION}")    
+    endif()
+    
+    if (MSVC)
+        # -D_UNICODE -DUNICODE 
+        add_definitions (-D_CRT_NONSTDC_NO_DEPRECATE -D_CRT_SECURE_NO_WARNINGS -D_CRT_NON_CONFORMING_SWPRINTFS -D_CRT_SECURE_NO_DEPRECATE -DLIBDIR="")
     endif()
 endif()
 
