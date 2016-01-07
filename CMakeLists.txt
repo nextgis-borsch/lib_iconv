@@ -53,9 +53,12 @@ include_directories ( ${CMAKE_CURRENT_SOURCE_DIR}/include )
 include_directories ( ${CMAKE_CURRENT_SOURCE_DIR}/srclib )
 include_directories ( ${CMAKE_CURRENT_BINARY_DIR}/include )
 
-#add_definitions ( -Dset_relocation_prefix=libcharset_set_relocation_prefix -Drelocate=libcharset_relocate -DHAVE_CONFIG_H -DINSTALLPREFIX=NULL -DNO_XMALLOC -DBUILDING_LIBCHARSET -DINSTALLDIR="" -DLIBDIR="" -DENABLE_RELOCATABLE=1 -DBUILDING_DLL -DIN_LIBRARY )
-
-
+#add_definitions ( -DINSTALLPREFIX=NULL -DNO_XMALLOC -DBUILDING_LIBCHARSET -DINSTALLDIR="" )
+if(${ENABLE_RELOCATABLE})
+    add_definitions ( -Dset_relocation_prefix=libcharset_set_relocation_prefix -Drelocate=libcharset_relocate -DENABLE_RELOCATABLE=1 )
+else()
+    add_definitions ( -DENABLE_RELOCATABLE=0 )
+endif()
 
 set(PUBLIC_HDRS
     ${CMAKE_CURRENT_BINARY_DIR}/include/iconv.h
@@ -65,11 +68,35 @@ set(PRIVATE_HDRS
     ${CMAKE_CURRENT_BINARY_DIR}/config.h
     ${CMAKE_CURRENT_BINARY_DIR}/include/libcharset.h
     ${CMAKE_CURRENT_BINARY_DIR}/include/localcharset.h
+    libcharset/lib/relocatable.h
 )
 
 set(SRCS
     lib/iconv.c
+    libcharset/lib/localcharset.c
+    libcharset/lib/relocatable.c
 )
+
+if(WIN32)
+
+    if(BUILD_SHARED_LIBS)
+        set(SRCS ${SRCS} 
+            windows/libiconv.rc
+        )
+        add_definitions(-DBUILDING_DLL)
+        add_definitions (-DPACKAGE_VERSION_MAJOR=${ICONV_MAJOR_VERSION})
+        add_definitions (-DPACKAGE_VERSION_MINOR=${ICONV_MINOR_VERSION}) 
+        add_definitions (-DPACKAGE_VERSION_SUBMINOR=0) 
+        add_definitions (-DPACKAGE_VERSION_STRING="lib${PROJECT_NAME}-${VERSION}")    
+    endif()
+    
+    if (MSVC)
+        # -D_UNICODE -DUNICODE 
+        add_definitions (-D_CRT_NONSTDC_NO_DEPRECATE -D_CRT_SECURE_NO_WARNINGS -D_CRT_NON_CONFORMING_SWPRINTFS -D_CRT_SECURE_NO_DEPRECATE -DLIBDIR="")
+    endif()
+endif()
+
+add_definitions(-DIN_LIBRARY -DBUILDING_LIBICONV) # -DLIBICONV_PLUG
 
 report_version(${PROJECT_NAME} ${VERSION})     
 

@@ -297,13 +297,13 @@ typedef int mbstate_t;
 /* Define to `unsigned int' if <sys/types.h> does not define. */
 #cmakedefine HAVE_SIZE_T
 #ifndef HAVE_SIZE_T
-typedef unsigned int size_t
+typedef unsigned int size_t;
 #endif
 
 /* Define as a signed type of the same size as size_t. */
 #cmakedefine HAVE_SSIZE_T
 #ifndef HAVE_SSIZE_T
-typedef int ssize_t
+typedef int ssize_t;
 #endif
 
 /* Define as a marker that can be attached to declarations that might not

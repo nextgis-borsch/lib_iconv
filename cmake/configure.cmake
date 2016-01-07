@@ -257,8 +257,11 @@ check_c_source_compiles("
     }    
     " HAVE_VISIBILITY)
     
+if(NOT HAVE_VISIBILITY)
+    set(HAVE_VISIBILITY 0)
+endif()        
+    
 check_include_files ( wchar.h HAVE_WCHAR_H )
-check_type_size ( wchar_t WCHAR_T )    
 if(HAVE_WCHAR_H)
     set(HAVE_WCHAR_H 1)
     set(BROKEN_WCHAR_H 0)
@@ -267,11 +270,21 @@ else()
     set(BROKEN_WCHAR_H 1)
 endif()
 
+check_type_size ( wchar_t WCHAR_T )    
+if(HAVE_WCHAR_T)
+    set(HAVE_WCHAR_T 1)
+endif()
+
 check_function_exists ( wcrtomb HAVE_WCRTOMB )
 
 check_include_files ( winsock2.h HAVE_WINSOCK2_H )
 
 check_function_exists ( _NSGetExecutablePath HAVE__NSGETEXECUTABLEPATH )
+
+check_include_files ( xalloc.h HAVE_XMALLOC_H )
+if(NOT HAVE_XMALLOC_H)
+    add_definitions ( -DNO_XMALLOC )
+endif()
 
 set ( ICONV_CONST " " )
 
@@ -378,10 +391,15 @@ set(PACKAGE_NAME "lib${PACKAGE}")
 set(PACKAGE_VERSION ${VERSION})
 set(PACKAGE_STRING "${PACKAGE_NAME} ${PACKAGE_VERSION}")
 
-if(MSVC)
-    set(DLL_VARIABLE "__declspec (dllimport)")
+if(APPLE)
+    set(DLL_VARIABLE "__declspec(export)")
+else(WIN32)
+    set(DLL_VARIABLE "__declspec(dllexport)")
+else(HAVE_VISIBILITY)
+    set(DLL_VARIABLE "__attribute__((__visibility__("default")))")  
+else()
+    set(DLL_VARIABLE "__attribute__((dllexport))") 
 endif()
-
 
 configure_file(${CMAKE_MODULE_PATH}/config.h.in ${CMAKE_CURRENT_BINARY_DIR}/config.h IMMEDIATE @ONLY)
 add_definitions(-DHAVE_CONFIG_H) 
