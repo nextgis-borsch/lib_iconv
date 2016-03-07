@@ -83,7 +83,7 @@ if(WIN32)
         set(SRCS ${SRCS} 
             windows/libiconv.rc
         )
-        add_definitions(-DBUILDING_DLL)
+        add_definitions(-DBUILDING_DLL -DBUILDING_LIBICONV)
         add_definitions (-DPACKAGE_VERSION_MAJOR=${ICONV_MAJOR_VERSION})
         add_definitions (-DPACKAGE_VERSION_MINOR=${ICONV_MINOR_VERSION}) 
         add_definitions (-DPACKAGE_VERSION_SUBMINOR=0) 
@@ -96,7 +96,7 @@ if(WIN32)
     endif()
 endif()
 
-add_definitions(-DIN_LIBRARY -DBUILDING_LIBICONV) # -DLIBICONV_PLUG
+add_definitions(-DIN_LIBRARY) # -DLIBICONV_PLUG
 
 report_version(${PROJECT_NAME} ${VERSION})     
 
