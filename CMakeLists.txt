@@ -98,6 +98,10 @@ endif()
 
 add_definitions(-DIN_LIBRARY) # -DLIBICONV_PLUG
 
+if(NOT SKIP_LIBICONV_PLUG)
+    add_definitions(-DLIBICONV_PLUG)
+endif()
+
 report_version(${PROJECT_NAME} ${VERSION})     
 
 if(BUILD_SHARED_LIBS)
