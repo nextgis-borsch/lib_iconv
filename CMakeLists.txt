@@ -98,7 +98,7 @@ endif()
 
 add_definitions(-DIN_LIBRARY) # -DLIBICONV_PLUG
 
-if(NOT SKIP_LIBICONV_PLUG)
+if(WITH_LIBICONV_PLUG)
     add_definitions(-DLIBICONV_PLUG)
 endif()
 
