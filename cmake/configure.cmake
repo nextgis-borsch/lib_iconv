@@ -33,6 +33,10 @@ include(CheckStructHasMember)
 include(CheckTypeSize)
 include(TestBigEndian)
 
+if(CMAKE_GENERATOR_TOOLSET MATCHES "*xp")
+    add_definitions(-D_WIN32_WINNT=0x0501)
+endif()
+
 check_c_source_compiles("
     #define __EXTENSIONS__ 1
     int main ()
