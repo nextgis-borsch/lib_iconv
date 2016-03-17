@@ -40,8 +40,7 @@ set(INSTALL_LIB_DIR ${CMAKE_INSTALL_LIBDIR} CACHE INTERNAL "Installation directo
 set(INSTALL_INC_DIR ${CMAKE_INSTALL_INCLUDEDIR} CACHE INTERNAL "Installation directory for headers" FORCE)
 
 include(util)
-set(ICONV_MAJOR_VERSION -1)
-set(ICONV_MINOR_VERSION -1)
+
 check_version(ICONV_MAJOR_VERSION ICONV_MINOR_VERSION)
 set(VERSION ${ICONV_MAJOR_VERSION}.${ICONV_MINOR_VERSION})
 
@@ -85,7 +84,7 @@ if(WIN32)
         set(SRCS ${SRCS} 
             windows/libiconv.rc
         )
-        add_definitions(-DBUILDING_DLL)
+        add_definitions(-DBUILDING_DLL -DBUILDING_LIBICONV)
         add_definitions (-DPACKAGE_VERSION_MAJOR=${ICONV_MAJOR_VERSION})
         add_definitions (-DPACKAGE_VERSION_MINOR=${ICONV_MINOR_VERSION}) 
         add_definitions (-DPACKAGE_VERSION_SUBMINOR=0) 
@@ -98,7 +97,11 @@ if(WIN32)
     endif()
 endif()
 
-add_definitions(-DIN_LIBRARY -DBUILDING_LIBICONV) # -DLIBICONV_PLUG
+add_definitions(-DIN_LIBRARY) # -DLIBICONV_PLUG
+
+if(WITH_LIBICONV_PLUG)
+    add_definitions(-DLIBICONV_PLUG)
+endif()
 
 report_version(${PROJECT_NAME} ${VERSION})     
 
