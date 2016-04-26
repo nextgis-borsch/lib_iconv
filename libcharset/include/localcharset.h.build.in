@@ -20,10 +20,10 @@
 #ifndef _LOCALCHARSET_H
 #define _LOCALCHARSET_H
 
-#if @HAVE_VISIBILITY@ && BUILDING_LIBCHARSET
-#define LIBCHARSET_DLL_EXPORTED __attribute__((__visibility__("default")))
+#ifdef ICONV_STATIC
+  #define LIBCHARSET_DLL_EXPORTED
 #else
-#define LIBCHARSET_DLL_EXPORTED
+  #define LIBCHARSET_DLL_EXPORTED @DLL_VARIABLE@
 #endif
 
 
