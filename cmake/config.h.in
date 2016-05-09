@@ -335,3 +335,8 @@ typedef int ssize_t;
 /* On Windows, variables that may be in a DLL must be marked specially.  */
 #cmakedefine DLL_VARIABLE @DLL_VARIABLE@
 
+/* Define to 1 if O_NOATIME works. */
+#cmakedefine HAVE_WORKING_O_NOATIME 1
+
+/* Define to 1 if O_NOFOLLOW works. */
+#cmakedefine HAVE_WORKING_O_NOFOLLOW 1

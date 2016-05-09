@@ -405,6 +405,81 @@ else()
     set(DLL_VARIABLE "__attribute__((dllexport))") 
 endif()
 
+file(WRITE "${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/CMakeTmp/src.c"
+      "#include <sys/types.h>
+           #include <sys/stat.h>
+           #include <unistd.h>
+           #include <fcntl.h>
+           #ifndef O_NOATIME
+            #define O_NOATIME 0
+           #endif
+           #ifndef O_NOFOLLOW
+            #define O_NOFOLLOW 0
+           #endif
+           static int const constants[] =
+            {
+              O_CREAT, O_EXCL, O_NOCTTY, O_TRUNC, O_APPEND,
+              O_NONBLOCK, O_SYNC, O_ACCMODE, O_RDONLY, O_RDWR, O_WRONLY
+            };
+
+int
+main ()
+{
+
+            int status = !constants;
+            {
+              static char const sym[] = "conftest.sym";
+              if (symlink (".", sym) != 0
+                  || close (open (sym, O_RDONLY | O_NOFOLLOW)) == 0)
+                status |= 32;
+              unlink (sym);
+            }
+            {
+              static char const file[] = "confdefs.h";
+              int fd = open (file, O_RDONLY | O_NOATIME);
+              char c;
+              struct stat st0, st1;
+              if (fd < 0
+                  || fstat (fd, &st0) != 0
+                  || sleep (1) != 0
+                  || read (fd, &c, 1) != 1
+                  || close (fd) != 0
+                  || stat (file, &st1) != 0
+                  || st0.st_atime != st1.st_atime)
+                status |= 64;
+            }
+            return status;
+  ;
+  return 0;
+}
+\n")
+
+message(STATUS "Performing Test ${VAR}")
+try_run(NOTEST_EXITCODE NOTEST_COMPILED
+      ${CMAKE_BINARY_DIR}
+      ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/CMakeTmp/src.c
+      COMPILE_DEFINITIONS ${CMAKE_REQUIRED_DEFINITIONS}
+      CMAKE_FLAGS -DCOMPILE_DEFINITIONS:STRING=${MACRO_CHECK_FUNCTION_DEFINITIONS}
+      -DCMAKE_SKIP_RPATH:BOOL=${CMAKE_SKIP_RPATH}
+      "${CHECK_C_SOURCE_COMPILES_ADD_LIBRARIES}"
+      "${CHECK_C_SOURCE_COMPILES_ADD_INCLUDES}"
+      COMPILE_OUTPUT_VARIABLE OUTPUT)
+      
+if(${NOTEST_EXITCODE} EQUAL 32)
+    set(HAVE_WORKING_O_NOFOLLOW OFF)
+    set(HAVE_WORKING_O_NOATIME ON)
+endif(${NOTEST_EXITCODE} EQUAL 64)
+    set(HAVE_WORKING_O_NOFOLLOW ON)
+    set(HAVE_WORKING_O_NOATIME OFF)
+endif(${NOTEST_EXITCODE} EQUAL 64)
+    set(HAVE_WORKING_O_NOFOLLOW OFF)
+    set(HAVE_WORKING_O_NOATIME OFF)
+else()
+    set(HAVE_WORKING_O_NOFOLLOW ON)
+    set(HAVE_WORKING_O_NOATIME ON)
+endif()
+
+
 configure_file(${CMAKE_MODULE_PATH}/config.h.in ${CMAKE_CURRENT_BINARY_DIR}/config.h IMMEDIATE @ONLY)
 add_definitions(-DHAVE_CONFIG_H) 
 
