@@ -428,14 +428,14 @@ main ()
 
             int status = !constants;
             {
-              static char const sym[] = "conftest.sym";
-              if (symlink (".", sym) != 0
+              static char const sym[] = \"conftest.sym\";
+              if (symlink (\".\", sym) != 0
                   || close (open (sym, O_RDONLY | O_NOFOLLOW)) == 0)
                 status |= 32;
               unlink (sym);
             }
             {
-              static char const file[] = "confdefs.h";
+              static char const file[] = \"confdefs.h\";
               int fd = open (file, O_RDONLY | O_NOATIME);
               char c;
               struct stat st0, st1;
@@ -451,10 +451,9 @@ main ()
             return status;
   ;
   return 0;
-}
-\n")
+}")
 
-message(STATUS "Performing Test ${VAR}")
+message(STATUS "Performing Test HAVE_WORKING_O_NOFOLLOW and HAVE_WORKING_O_NOATIME")
 set(NOTEST_EXITCODE 0)
 try_run(NOTEST_EXITCODE NOTEST_COMPILED
       ${CMAKE_BINARY_DIR}
