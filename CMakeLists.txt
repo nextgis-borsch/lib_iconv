@@ -97,7 +97,7 @@ if(WIN32)
     endif()
 endif()
 
-add_definitions(-DIN_LIBRARY) # -DLIBICONV_PLUG
+add_definitions(-DIN_LIBRARY -DLIBDIR) # -DLIBICONV_PLUG
 
 if(WITH_LIBICONV_PLUG)
     add_definitions(-DLIBICONV_PLUG)
