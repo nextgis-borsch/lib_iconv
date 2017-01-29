@@ -81,18 +81,18 @@ set(SRCS
 if(WIN32)
 
     if(BUILD_SHARED_LIBS)
-        set(SRCS ${SRCS} 
+        set(SRCS ${SRCS}
             windows/libiconv.rc
         )
         add_definitions(-DBUILDING_DLL -DBUILDING_LIBICONV)
         add_definitions (-DPACKAGE_VERSION_MAJOR=${ICONV_MAJOR_VERSION})
-        add_definitions (-DPACKAGE_VERSION_MINOR=${ICONV_MINOR_VERSION}) 
-        add_definitions (-DPACKAGE_VERSION_SUBMINOR=0) 
-        add_definitions (-DPACKAGE_VERSION_STRING="lib${PROJECT_NAME}-${VERSION}")    
+        add_definitions (-DPACKAGE_VERSION_MINOR=${ICONV_MINOR_VERSION})
+        add_definitions (-DPACKAGE_VERSION_SUBMINOR=0)
+        add_definitions (-DPACKAGE_VERSION_STRING="lib${PROJECT_NAME}-${VERSION}")
     endif()
-    
+
     if (MSVC)
-        # -D_UNICODE -DUNICODE 
+        # -D_UNICODE -DUNICODE
         add_definitions (-D_CRT_NONSTDC_NO_DEPRECATE -D_CRT_SECURE_NO_WARNINGS -D_CRT_NON_CONFORMING_SWPRINTFS -D_CRT_SECURE_NO_DEPRECATE -DLIBDIR="")
     endif()
 endif()
@@ -103,7 +103,7 @@ if(WITH_LIBICONV_PLUG)
     add_definitions(-DLIBICONV_PLUG)
 endif()
 
-report_version(${PROJECT_NAME} ${VERSION})     
+report_version(${PROJECT_NAME} ${VERSION})
 
 set(LIB_NAME ${PROJECT_NAME})
 if(BUILD_SHARED_LIBS)
@@ -113,18 +113,18 @@ if(BUILD_SHARED_LIBS)
 else()
     if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
         set( CMAKE_CXX_FLAGS "-fpic ${CMAKE_CXX_FLAGS}" )
-        set( CMAKE_C_FLAGS   "-fpic ${CMAKE_C_FLAGS}" )  
+        set( CMAKE_C_FLAGS   "-fpic ${CMAKE_C_FLAGS}" )
     endif()
     add_definitions(-DICONV_STATIC)
     add_library(${LIB_NAME} STATIC ${SRCS} ${PUBLIC_HDRS} ${PRIVATE_HDRS})
     set_target_properties(${LIB_NAME} PROPERTIES SOVERSION 1)
-endif()   
+endif()
 
 if (REGISTER_PACKAGE)
     export(TARGETS ${LIB_NAME} FILE ${LIB_NAME}-exports.cmake)
 
     set(EXPORT_PACKAGE_NAME ICONV)
-    set(EXPORT_PACKAGE_NAME_UPPER ICONV)
+    string(TOUPPER ${EXPORT_PACKAGE_NAME} EXPORT_PACKAGE_NAME_UPPER)
     set(EXPORT_PACKAGE_LIB_NAME ${LIB_NAME})
 
     export(PACKAGE ${EXPORT_PACKAGE_NAME})
@@ -133,8 +133,7 @@ if (REGISTER_PACKAGE)
     configure_package_config_file(
         ${CMAKE_SOURCE_DIR}/cmake/PackageConfig.cmake.in
         ${CMAKE_CURRENT_BINARY_DIR}/${EXPORT_PACKAGE_NAME}Config.cmake
-        INSTALL_DESTINATION ${INSTALL_LIB_DIR}/cmake
-        PATH_VARS INSTALL_INC_DIR )
+    INSTALL_DESTINATION ${CMAKE_CURRENT_BINARY_DIR} )
     write_basic_package_version_file(
         ${CMAKE_CURRENT_BINARY_DIR}/${EXPORT_PACKAGE_NAME}ConfigVersion.cmake
         VERSION ${VERSION}
@@ -158,7 +157,7 @@ if(UNIX)
 endif()
 
 if(NOT SKIP_INSTALL_LIBRARIES AND NOT SKIP_INSTALL_ALL )
-    install(TARGETS ${LIB_NAME} 
+    install(TARGETS ${LIB_NAME}
         RUNTIME DESTINATION "${INSTALL_BIN_DIR}"
         ARCHIVE DESTINATION "${INSTALL_LIB_DIR}"
         LIBRARY DESTINATION "${INSTALL_LIB_DIR}" )
@@ -166,4 +165,3 @@ endif()
 if(NOT SKIP_INSTALL_HEADERS AND NOT SKIP_INSTALL_ALL )
     install(FILES ${PUBLIC_HDRS} DESTINATION "${INSTALL_INC_DIR}")
 endif()
-
