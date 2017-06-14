@@ -42,11 +42,11 @@ check_c_source_compiles("
     int main ()
     {  return 0; }
     " DEFINE_EXTENSIONS)
-    
+
 if(DEFINE_EXTENSIONS)
   set(CMAKE_REQUIRED_DEFINITIONS ${CMAKE_REQUIRED_DEFINITIONS} -D__EXTENSIONS__=1 -D_ALL_SOURCE=1 -D_DARWIN_C_SOURCE=1 -D_GNU_SOURCE=1 -D_POSIX_PTHREAD_SEMANTICS=1 -D_TANDEM_SOURCE=1)
   add_definitions(-D__EXTENSIONS__=1 -D_ALL_SOURCE=1 -D_DARWIN_C_SOURCE=1 -D_GNU_SOURCE=1 -D_POSIX_PTHREAD_SEMANTICS=1 -D_TANDEM_SOURCE=1)
-endif()    
+endif()
 
 unset(DOUBLE_SLASH_IS_DISTINCT_ROOT)
 unset(EILSEQ)
@@ -66,12 +66,12 @@ check_c_source_compiles("
         return * gettext (\"\")${gt_expression_test_code} + _nl_msg_cat_cntr + *_nl_domain_bindings;
     }
     " ENABLE_NLS)
-#option ( ENABLE_NLS "Translation of program messages to the user's native language is requested" OFF)    
+#option ( ENABLE_NLS "Translation of program messages to the user's native language is requested" OFF)
 
 option ( ENABLE_RELOCATABLE "The package shall run at any location in the file system" ON )
 
 check_c_source_compiles("
-    #include <stdlib.h> 
+    #include <stdlib.h>
     #if defined __MACH__ && defined __APPLE__
     #include <mach/mach.h>
     #include <mach/mach_error.h>
@@ -94,7 +94,7 @@ check_c_source_compiles("
         abort ();
       exit (1);
     }
-    
+
     static void nocrash_init (void)
     {
       mach_port_t self = mach_task_self ();
@@ -208,7 +208,7 @@ check_c_source_compiles("
     #include <wchar.h>
     int main ()
     {
-        mbstate_t x; 
+        mbstate_t x;
         return sizeof x;
     }" HAVE_MBSTATE_T)
 
@@ -258,13 +258,13 @@ check_c_source_compiles("
     void dummyfunc (void) {}
     int main (){
       return 0;
-    }    
+    }
     " HAVE_VISIBILITY)
-    
+
 if(NOT HAVE_VISIBILITY)
     set(HAVE_VISIBILITY 0)
-endif()        
-    
+endif()
+
 check_include_files ( wchar.h HAVE_WCHAR_H )
 if(HAVE_WCHAR_H)
     set(HAVE_WCHAR_H 1)
@@ -274,7 +274,7 @@ else()
     set(BROKEN_WCHAR_H 1)
 endif()
 
-check_type_size ( wchar_t WCHAR_T )    
+check_type_size ( wchar_t WCHAR_T )
 if(HAVE_WCHAR_T)
     set(HAVE_WCHAR_T 1)
 endif()
@@ -317,10 +317,10 @@ check_c_source_compiles("
     #include <sys/stat.h>
     int main ()
     {
-        struct stat st; 
+        struct stat st;
         return stat (\".\", &st) != stat (\"./\", &st);
     }" REPLACE_FUNC_STAT_DIR)
-    
+
 check_c_source_compiles("
     #include <sys/stat.h>
     int main ()
@@ -335,7 +335,7 @@ check_c_source_compiles("
         #endif
         return result;
     }" REPLACE_FUNC_STAT_FILE)
-    
+
 check_c_source_compiles("
     #include <string.h>
     #include <errno.h>
@@ -351,8 +351,8 @@ check_c_source_compiles("
            result |= 4;
         return result;
     }" REPLACE_STRERROR_0)
-    
-check_c_source_runs("    
+
+check_c_source_runs("
     #include <errno.h>
     #include <stdio.h>
     #include <stdlib.h>
@@ -361,10 +361,10 @@ check_c_source_runs("
     {
         char buf[100];
         char x = *strerror_r (0, buf, sizeof buf);
-	    return ! isalpha (x);
+	    return isalpha (x) ? 1 : 0;
     }" STRERROR_R_CHAR_P)
-    
-    
+
+
 set ( USE_UNLOCKED_IO 1 )
 
 test_big_endian(WORDS_BIGENDIAN)
@@ -387,8 +387,8 @@ foreach(TEST_INLINE ${TEST_INLINES})
     endif()
 endforeach()
 
-check_type_size(size_t SIZE_T)   
-check_type_size(ssize_t SSIZE_T) 
+check_type_size(size_t SIZE_T)
+check_type_size(ssize_t SSIZE_T)
 
 set(PACKAGE ${PROJECT_NAME})
 set(PACKAGE_NAME "lib${PACKAGE}")
@@ -400,9 +400,9 @@ if(APPLE)
 else(WIN32)
     set(DLL_VARIABLE "__declspec(dllexport)")
 else(HAVE_VISIBILITY)
-    set(DLL_VARIABLE "__attribute__((__visibility__(\"default\")))")  
+    set(DLL_VARIABLE "__attribute__((__visibility__(\"default\")))")
 else()
-    set(DLL_VARIABLE "__attribute__((dllexport))") 
+    set(DLL_VARIABLE "__attribute__((dllexport))")
 endif()
 
 file(WRITE "${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/CMakeTmp/src.c"
@@ -464,7 +464,7 @@ try_run(NOTEST_EXITCODE NOTEST_COMPILED
       "${CHECK_C_SOURCE_COMPILES_ADD_LIBRARIES}"
       "${CHECK_C_SOURCE_COMPILES_ADD_INCLUDES}"
       COMPILE_OUTPUT_VARIABLE OUTPUT)
-      
+
 if(NOTEST_EXITCODE EQUAL 32)
     set(HAVE_WORKING_O_NOFOLLOW OFF)
     set(HAVE_WORKING_O_NOATIME ON)
@@ -481,11 +481,10 @@ endif()
 
 
 configure_file(${CMAKE_SOURCE_DIR}/cmake/config.h.in ${CMAKE_CURRENT_BINARY_DIR}/config.h IMMEDIATE @ONLY)
-add_definitions(-DHAVE_CONFIG_H) 
+add_definitions(-DHAVE_CONFIG_H)
 
 configure_file ( include/iconv.h.build.in ${CMAKE_CURRENT_BINARY_DIR}/include/iconv.h IMMEDIATE @ONLY)
 configure_file ( libcharset/include/libcharset.h.in ${CMAKE_CURRENT_BINARY_DIR}/include/libcharset.h IMMEDIATE @ONLY)
 configure_file ( libcharset/include/localcharset.h.build.in ${CMAKE_CURRENT_BINARY_DIR}/include/localcharset.h IMMEDIATE @ONLY)
 #configure_file ( srclib/uniwidth.in.h ${CMAKE_CURRENT_BINARY_DIR}/srclib/uniwidth.h IMMEDIATE @ONLY)
 #configure_file ( srclib/unitypes.in.h ${CMAKE_CURRENT_BINARY_DIR}/srclib/unitypes.h IMMEDIATE @ONLY)
-
