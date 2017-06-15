@@ -352,18 +352,31 @@ check_c_source_compiles("
         return result;
     }" REPLACE_STRERROR_0)
 
-check_c_source_runs("
-    #include <errno.h>
-    #include <stdio.h>
-    #include <stdlib.h>
-    extern char *strerror_r ();
-    int main ()
-    {
-        char buf[100];
-        char x = *strerror_r (0, buf, sizeof buf);
-	    return isalpha (x) ? 1 : 0;
-    }" STRERROR_R_CHAR_P)
-
+if(CMAKE_CROSSCOMPILING)
+    check_c_source_compiles("
+        #include <errno.h>
+        #include <stdio.h>
+        #include <stdlib.h>
+        extern char *strerror_r ();
+        int main ()
+        {
+            char buf[100];
+            char x = *strerror_r (0, buf, sizeof buf);
+    	    return isalpha (x) ? 1 : 0;
+        }" STRERROR_R_CHAR_P)
+else()
+    check_c_source_runs("
+        #include <errno.h>
+        #include <stdio.h>
+        #include <stdlib.h>
+        extern char *strerror_r ();
+        int main ()
+        {
+            char buf[100];
+            char x = *strerror_r (0, buf, sizeof buf);
+    	    return isalpha (x) ? 1 : 0;
+        }" STRERROR_R_CHAR_P)
+endif()
 
 set ( USE_UNLOCKED_IO 1 )
 
@@ -455,6 +468,7 @@ main ()
 
 message(STATUS "Performing Test HAVE_WORKING_O_NOFOLLOW and HAVE_WORKING_O_NOATIME")
 set(NOTEST_EXITCODE 0)
+if(NOT CMAKE_CROSSCOMPILING)
 try_run(NOTEST_EXITCODE NOTEST_COMPILED
       ${CMAKE_BINARY_DIR}
       ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/CMakeTmp/src.c
@@ -464,6 +478,7 @@ try_run(NOTEST_EXITCODE NOTEST_COMPILED
       "${CHECK_C_SOURCE_COMPILES_ADD_LIBRARIES}"
       "${CHECK_C_SOURCE_COMPILES_ADD_INCLUDES}"
       COMPILE_OUTPUT_VARIABLE OUTPUT)
+endif()
 
 if(NOTEST_EXITCODE EQUAL 32)
     set(HAVE_WORKING_O_NOFOLLOW OFF)
