@@ -119,7 +119,13 @@ if(BUILD_SHARED_LIBS)
     add_library(${LIB_NAME} SHARED ${SRCS} ${PUBLIC_HDRS} ${PRIVATE_HDRS})
     set_target_properties(${LIB_NAME} PROPERTIES
         VERSION ${VERSION}
-        SOVERSION 1)
+        SOVERSION 1
+    )
+    if(WIN32)
+        set_target_properties(${LIB_NAME} PROPERTIES
+            DEFINE_SYMBOL ICONV_DLL_EXPORTS
+        )
+    endif()
 else()
     add_definitions(-DICONV_STATIC)
     add_library(${LIB_NAME} STATIC ${SRCS} ${PUBLIC_HDRS} ${PRIVATE_HDRS})
@@ -137,6 +143,7 @@ if(WIN32)
 endif()
 
 add_executable(iconv ${APP_SRCS})
+target_link_libraries(iconv ${LIB_NAME})
 
 set(APP_NO_SRCS
     src/iconv_no_i18n.c
@@ -149,6 +156,7 @@ if(WIN32)
 endif()
 
 add_executable(iconv_no_i18n ${APP_NO_SRCS})
+target_link_libraries(iconv_no_i18n ${LIB_NAME})
 
 # add test
 enable_testing()
