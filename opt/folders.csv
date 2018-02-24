@@ -5,7 +5,7 @@ doc,doc,skip,
 extras,extras,skip,
 gnulib-local,gnulib-local,skip,
 include,include,,"h,in"
-lib,lib,,"h,c"
+lib,lib,,"h,c,def"
 libcharset,libcharset,,"AUTHORS,ChangeLog,COPYING.lig,NEWS,README"
 libcharset/autoconf,libcharset/autoconf,skip,
 libcharset/build-aux,libcharset/build-aux,skip,
@@ -20,7 +20,7 @@ os2,os2,,def
 po,po,skip,
 preload,preload,skip,
 src,src,,"c,h"
-srclib,srclib,skip,
+srclib,srclib,,h
 srcm4,srcm4,skip,
 tests,tests,,*
 tools,tools,skip,
