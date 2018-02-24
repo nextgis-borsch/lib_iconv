@@ -59,24 +59,27 @@ function(check_version major minor)
 
     file(STRINGS "${CMAKE_CURRENT_SOURCE_DIR}/include/iconv.h.in" iconv_version_str
          REGEX "^#[\t ]*define[\t ]+_LIBICONV_VERSION[\t ]+0x([0-9a-fA-F])+.*")
-        
-    
+
+
     string(REGEX MATCH "x([0-9a-fA-F])+"
       VERSION ${iconv_version_str})
     string(REGEX MATCH "([0-9a-fA-F]+)"
       VERSION ${VERSION})
-     
-    from_hex("${VERSION}" VERSION_DEC)  
-    
+
+    from_hex("${VERSION}" VERSION_DEC)
+
     math(EXPR MAJOR_VERSION "${VERSION_DEC} / 256")
-    math(EXPR MINOR_VERSION "${VERSION_DEC} - ${MAJOR_VERSION} * 256") 
-       
+    math(EXPR MINOR_VERSION "${VERSION_DEC} - ${MAJOR_VERSION} * 256")
+
     set(${major} ${MAJOR_VERSION} PARENT_SCOPE)
     set(${minor} ${MINOR_VERSION} PARENT_SCOPE)
-    
+
     # Store version string in file for installer needs
     file(TIMESTAMP ${CMAKE_CURRENT_SOURCE_DIR}/include/iconv.h.in VERSION_DATETIME "%Y-%m-%d %H:%M:%S" UTC)
-    file(WRITE ${CMAKE_BINARY_DIR}/version.str "${MAJOR_VERSION}.${MINOR_VERSION}\n${VERSION_DATETIME}")
+    set(VERSION ${MAJOR_VERSION}.${MINOR_VERSION})
+    get_cpack_filename(${VERSION} PROJECT_CPACK_FILENAME)
+    file(WRITE ${CMAKE_BINARY_DIR}/version.str "${VERSION}\n${VERSION_DATETIME}\n${PROJECT_CPACK_FILENAME}")
+
 endfunction(check_version)
 
 
@@ -85,8 +88,42 @@ function(report_version name ver)
     string(ASCII 27 Esc)
     set(BoldYellow  "${Esc}[1;33m")
     set(ColourReset "${Esc}[m")
-        
-    message(STATUS "${BoldYellow}${name} version ${ver}${ColourReset}")
-    
-endfunction()  
 
+    message(STATUS "${BoldYellow}${name} version ${ver}${ColourReset}")
+
+endfunction()
+
+
+function(get_cpack_filename ver name)
+    get_compiler_version(COMPILER)
+    if(BUILD_STATIC_LIBS)
+        set(STATIC_PREFIX "static-")
+    endif()
+
+    if(BUILD_SHARED_LIBS OR OSX_FRAMEWORK)
+        set(${name} ${PROJECT_NAME}-${STATIC_PREFIX}${ver}-${COMPILER} PARENT_SCOPE)
+    else()
+        set(${name} ${PROJECT_NAME}-${STATIC_PREFIX}${ver}-STATIC-${COMPILER} PARENT_SCOPE)
+    endif()
+endfunction()
+
+function(get_compiler_version ver)
+    ## Limit compiler version to 2 or 1 digits
+    string(REPLACE "." ";" VERSION_LIST ${CMAKE_C_COMPILER_VERSION})
+    list(LENGTH VERSION_LIST VERSION_LIST_LEN)
+    if(VERSION_LIST_LEN GREATER 2 OR VERSION_LIST_LEN EQUAL 2)
+        list(GET VERSION_LIST 0 COMPILER_VERSION_MAJOR)
+        list(GET VERSION_LIST 1 COMPILER_VERSION_MINOR)
+        set(COMPILER ${CMAKE_C_COMPILER_ID}-${COMPILER_VERSION_MAJOR}.${COMPILER_VERSION_MINOR})
+    else()
+        set(COMPILER ${CMAKE_C_COMPILER_ID}-${CMAKE_C_COMPILER_VERSION})
+    endif()
+
+    if(WIN32)
+        if(CMAKE_CL_64)
+            set(COMPILER "${COMPILER}-64bit")
+        endif()
+    endif()
+
+    set(${ver} ${COMPILER} PARENT_SCOPE)
+endfunction()

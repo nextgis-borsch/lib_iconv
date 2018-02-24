@@ -3,7 +3,7 @@
 # Purpose:  CMake build scripts
 # Author:   Dmitry Baryshnikov, dmitry.baryshnikov@nexgis.com
 ################################################################################
-# Copyright (C) 2015, NextGIS <info@nextgis.com>
+# Copyright (C) 2015-2018, NextGIS <info@nextgis.com>
 #
 # Permission is hereby granted, free of charge, to any person obtaining a
 # copy of this software and associated documentation files (the "Software"),
@@ -28,6 +28,14 @@ cmake_minimum_required(VERSION 2.8.12 FATAL_ERROR)
 
 project(iconv)
 
+if(NOT DEFINED PACKAGE_VENDOR)
+    set(PACKAGE_VENDOR NextGIS)
+endif()
+
+if(NOT DEFINED PACKAGE_BUGREPORT)
+    set(PACKAGE_BUGREPORT info@nextgis.com)
+endif()
+
 # some init settings
 set(CMAKE_COLOR_MAKEFILE ON)
 # set path to additional CMake modules
@@ -35,9 +43,11 @@ set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake ${CMAKE_MODULE_PATH})
 
 include(GNUInstallDirs)
 
-set(INSTALL_BIN_DIR ${CMAKE_INSTALL_FULL_BINDIR} CACHE INTERNAL "Installation directory for executables" FORCE)
-set(INSTALL_LIB_DIR ${CMAKE_INSTALL_FULL_LIBDIR} CACHE INTERNAL "Installation directory for libraries" FORCE)
-set(INSTALL_INC_DIR ${CMAKE_INSTALL_FULL_INCLUDEDIR} CACHE INTERNAL "Installation directory for headers" FORCE)
+set(INSTALL_BIN_DIR ${CMAKE_INSTALL_BINDIR} CACHE INTERNAL "Installation directory for executables" FORCE)
+set(INSTALL_LIB_DIR ${CMAKE_INSTALL_LIBDIR} CACHE INTERNAL "Installation directory for libraries" FORCE)
+set(INSTALL_INC_DIR ${CMAKE_INSTALL_INCLUDEDIR} CACHE INTERNAL "Installation directory for headers" FORCE)
+set(INSTALL_MAN_DIR ${CMAKE_INSTALL_MANDIR} CACHE INTERNAL "Installation directory for manual pages" FORCE)
+set(INSTALL_CMAKECONF_DIR ${CMAKE_INSTALL_DATADIR}/${PROJECT_NAME}/CMake CACHE INTERNAL "Installation directory for cmake config files" FORCE)
 
 include(util)
 
@@ -79,7 +89,6 @@ set(SRCS
 )
 
 if(WIN32)
-
     if(BUILD_SHARED_LIBS)
         set(SRCS ${SRCS}
             windows/libiconv.rc
@@ -105,63 +114,165 @@ endif()
 
 report_version(${PROJECT_NAME} ${VERSION})
 
-set(LIB_NAME ${PROJECT_NAME})
+set(LIB_NAME lib${PROJECT_NAME})
 if(BUILD_SHARED_LIBS)
     add_library(${LIB_NAME} SHARED ${SRCS} ${PUBLIC_HDRS} ${PRIVATE_HDRS})
-    set_target_properties(${LIB_NAME} PROPERTIES DEFINE_SYMBOL XML2_DLL)
-    set_target_properties(${LIB_NAME} PROPERTIES SOVERSION 1)
+    set_target_properties(${LIB_NAME} PROPERTIES
+        VERSION ${VERSION}
+        SOVERSION 1)
 else()
-    if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
-        set( CMAKE_CXX_FLAGS "-fpic ${CMAKE_CXX_FLAGS}" )
-        set( CMAKE_C_FLAGS   "-fpic ${CMAKE_C_FLAGS}" )
-    endif()
     add_definitions(-DICONV_STATIC)
     add_library(${LIB_NAME} STATIC ${SRCS} ${PUBLIC_HDRS} ${PRIVATE_HDRS})
-    set_target_properties(${LIB_NAME} PROPERTIES SOVERSION 1)
 endif()
 
-if (REGISTER_PACKAGE)
-    export(TARGETS ${LIB_NAME} FILE ${LIB_NAME}-exports.cmake)
+# add app
+set(APP_SRCS
+    src/iconv.c
+)
 
-    set(EXPORT_PACKAGE_NAME ICONV)
-    string(TOUPPER ${EXPORT_PACKAGE_NAME} EXPORT_PACKAGE_NAME_UPPER)
-    set(EXPORT_PACKAGE_LIB_NAME ${LIB_NAME})
+if(WIN32)
+    set(APP_SRCS ${APP_SRCS}
+        windows/iconv.rc
+    )
+endif()
 
-    export(PACKAGE ${EXPORT_PACKAGE_NAME})
+add_executable(iconv ${APP_SRCS})
 
-    include(CMakePackageConfigHelpers)
-    configure_package_config_file(
-        ${CMAKE_SOURCE_DIR}/cmake/PackageConfig.cmake.in
-        ${CMAKE_CURRENT_BINARY_DIR}/${EXPORT_PACKAGE_NAME}Config.cmake
-    INSTALL_DESTINATION ${CMAKE_CURRENT_BINARY_DIR} )
-    write_basic_package_version_file(
-        ${CMAKE_CURRENT_BINARY_DIR}/${EXPORT_PACKAGE_NAME}ConfigVersion.cmake
-        VERSION ${VERSION}
-        COMPATIBILITY AnyNewerVersion )
-else()
-    export(TARGETS ${LIB_NAME} FILE ${LIB_NAME}-exports.cmake EXPORT_LINK_INTERFACE_LIBRARIES)
+set(APP_NO_SRCS
+    src/iconv_no_i18n.c
+)
+
+if(WIN32)
+    set(APP_NO_SRCS ${APP_NO_SRCS}
+        windows/iconv.rc
+    )
+endif()
+
+add_executable(iconv_no_i18n ${APP_NO_SRCS})
+
+# add test
+enable_testing()
+if(BUILD_TESTING)
+    set(STATEFUL_SRCS
+        UCS-2BE
+        UCS-2LE
+        UCS-4BE
+        UCS-4LE
+        UTF-16
+        UTF-16BE
+        UTF-16LE
+        UTF-32
+        UTF-32BE
+        UTF-32LE
+        UTF-7
+        CP1255
+        CP1258
+        TCVN
+        ISO-2022-JP
+        ISO-2022-JP-2
+        ISO-2022-JP-1
+        ISO-2022-JP-MS
+        ISO-2022-CN
+        ISO-2022-CN-EXT
+        HZ
+        ISO-2022-KR
+    )
+
+    foreach(ENC STATEFUL_SRCS)
+        add_test(NAME iconv_no_i18n_${ENC}
+                 COMMAND ${CMAKE_COMMAND}
+                 -DTEST_APP=$<TARGET_FILE:iconv_no_i18n>
+                 -DTEST_ARG1=${ENC}
+                 -DTEST_NAME=iconv_no_i18n_${ENC}
+                 -DTEST_COMPARE1=${CMAKE_CURRENT_SOURCE_DIR}/tests/${ENC}-snippet
+                 -DTEST_COMPARE2=${CMAKE_CURRENT_SOURCE_DIR}/tests/${ENC}-snippet.UTF-8
+                 -DTEST_COMPARE3=${CMAKE_CURRENT_BINARY_DIR}/${ENC}-snippet.UTF-8
+                 -P ${CMAKE_SOURCE_DIR}/cmake/TestCompareFiles.cmake)
+    endforeach()
+
+    add_test(iconv_1 iconv --version)
+    add_test(iconv_no_i18n_1 iconv_no_i18n --version)
+endif()
+
+set(PACKAGE_NAME ${PROJECT_NAME})
+string(TOUPPER ${PACKAGE_NAME} PACKAGE_UPPER_NAME)
+
+if(WIN32)
+    # On unix-like platforms the library is almost always called lib${PROJECT_NAME}
+    set_target_properties(${LIB_NAME} PROPERTIES OUTPUT_NAME ${PROJECT_NAME})
+endif()
+
+if(NOT SKIP_INSTALL_LIBRARIES AND NOT SKIP_INSTALL_ALL)
+    install(TARGETS ${LIB_NAME}
+        EXPORT ${PACKAGE_UPPER_NAME}Targets
+        RUNTIME DESTINATION ${INSTALL_BIN_DIR}
+        LIBRARY DESTINATION ${INSTALL_LIB_DIR}
+        ARCHIVE DESTINATION ${INSTALL_LIB_DIR}
+        INCLUDES DESTINATION ${INSTALL_INC_DIR}
+        FRAMEWORK DESTINATION ${INSTALL_LIB_DIR}
+    )
+endif()
+
+if(NOT SKIP_INSTALL_HEADERS AND NOT SKIP_INSTALL_ALL )
+    install(FILES ${PUBLIC_HDRS} DESTINATION "${INSTALL_INC_DIR}")
+endif()
+
+if(NOT SKIP_INSTALL_EXECUTABLES AND NOT SKIP_INSTALL_ALL)
+    install(TARGETS iconv iconv_no_i18n DESTINATION ${INSTALL_BIN_DIR} COMPONENT applications)
+endif()
+if(NOT SKIP_INSTALL_DOCS AND NOT SKIP_INSTALL_ALL)
+    install(FILES man/iconv.1 DESTINATION ${INSTALL_MAN_DIR}/man1)
+    install(DIRECTORY man DESTINATION ${INSTALL_MAN_DIR}/man3 PATTERN "*.3")
 endif()
 
 add_custom_target(uninstall COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake)
 
-if(NOT CYGWIN)
-    set_target_properties(${LIB_NAME} PROPERTIES VERSION ${VERSION})
+# Export package ===============================================================
+
+# Add path to includes to build-tree export
+target_include_directories(${LIB_NAME} PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
+)
+
+# Add all targets to the build-tree export set
+export(TARGETS ${LIB_NAME}
+    FILE ${PROJECT_BINARY_DIR}/${PACKAGE_UPPER_NAME}Targets.cmake)
+
+if(REGISTER_PACKAGE)
+    # Export the package for use from the build-tree
+    # (this registers the build-tree with a global CMake-registry)
+    export(PACKAGE ${PACKAGE_UPPER_NAME})
 endif()
 
-if(UNIX)
-    # On unix-like platforms the library is almost always called lib${PROJECT_NAME}
-    set_target_properties(${LIB_NAME} PROPERTIES OUTPUT_NAME ${PROJECT_NAME})
-#    if(NOT APPLE AND BUILD_SHARED_LIBS)
-#        set_target_properties(${LIB_NAME} PROPERTIES LINK_FLAGS "-Wl,--version-script,\"${CMAKE_CURRENT_SOURCE_DIR}/liblzma.map\"")
-#    endif()
+# Create the <Package>Config.cmake file
+configure_file(cmake/PackageConfig.cmake.in
+    ${PROJECT_BINARY_DIR}/${PACKAGE_UPPER_NAME}Config.cmake @ONLY)
+
+if(NOT SKIP_INSTALL_LIBRARIES AND NOT SKIP_INSTALL_ALL)
+    # Install the <Package>Config.cmake
+    install(FILES
+      ${PROJECT_BINARY_DIR}/${PACKAGE_UPPER_NAME}Config.cmake
+      DESTINATION ${INSTALL_CMAKECONF_DIR} COMPONENT dev)
+
+    # Install the export set for use with the install-tree
+    install(EXPORT ${PACKAGE_UPPER_NAME}Targets DESTINATION ${INSTALL_CMAKECONF_DIR} COMPONENT dev)
 endif()
 
-if(NOT SKIP_INSTALL_LIBRARIES AND NOT SKIP_INSTALL_ALL )
-    install(TARGETS ${LIB_NAME}
-        RUNTIME DESTINATION "${INSTALL_BIN_DIR}"
-        ARCHIVE DESTINATION "${INSTALL_LIB_DIR}"
-        LIBRARY DESTINATION "${INSTALL_LIB_DIR}" )
-endif()
-if(NOT SKIP_INSTALL_HEADERS AND NOT SKIP_INSTALL_ALL )
-    install(FILES ${PUBLIC_HDRS} DESTINATION "${INSTALL_INC_DIR}")
-endif()
+# Archiving ====================================================================
+
+set(CPACK_PACKAGE_NAME "${PACKAGE_NAME}")
+set(CPACK_PACKAGE_VENDOR "${PACKAGE_VENDOR}")
+set(CPACK_PACKAGE_VERSION "${VERSION}")
+set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "${PACKAGE_NAME} Installation")
+set(CPACK_PACKAGE_RELOCATABLE TRUE)
+set(CPACK_ARCHIVE_COMPONENT_INSTALL ON)
+set(CPACK_GENERATOR "ZIP")
+set(CPACK_MONOLITHIC_INSTALL ON)
+set(CPACK_STRIP_FILES TRUE)
+
+# Get cpack zip archive name
+get_cpack_filename(${VERSION} PROJECT_CPACK_FILENAME)
+set(CPACK_PACKAGE_FILE_NAME ${PROJECT_CPACK_FILENAME})
+
+include(CPack)
