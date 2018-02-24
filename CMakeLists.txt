@@ -64,7 +64,7 @@ include_directories ( ${CMAKE_CURRENT_SOURCE_DIR}/include )
 include_directories ( ${CMAKE_CURRENT_SOURCE_DIR}/srclib )
 include_directories ( ${CMAKE_CURRENT_BINARY_DIR}/include )
 
-#add_definitions ( -DINSTALLPREFIX=NULL -DNO_XMALLOC -DBUILDING_LIBCHARSET -DINSTALLDIR="" )
+add_definitions ( -DINSTALLPREFIX=NULL -DNO_XMALLOC -DBUILDING_LIBCHARSET -DINSTALLDIR="" )
 if(${ENABLE_RELOCATABLE})
     add_definitions ( -Dset_relocation_prefix=libcharset_set_relocation_prefix -Drelocate=libcharset_relocate -DENABLE_RELOCATABLE=1 )
 else()
@@ -93,7 +93,6 @@ if(WIN32)
         set(SRCS ${SRCS}
             windows/libiconv.rc
         )
-        add_definitions(-DBUILDING_DLL -DBUILDING_LIBICONV)
         add_definitions (-DPACKAGE_VERSION_MAJOR=${ICONV_MAJOR_VERSION})
         add_definitions (-DPACKAGE_VERSION_MINOR=${ICONV_MINOR_VERSION})
         add_definitions (-DPACKAGE_VERSION_SUBMINOR=0)
@@ -123,7 +122,8 @@ if(BUILD_SHARED_LIBS)
     )
     if(WIN32)
         set_target_properties(${LIB_NAME} PROPERTIES
-            DEFINE_SYMBOL ICONV_DLL_EXPORTS
+            DEFINE_SYMBOL BUILDING_LIBICONV
+            DEFINE_SYMBOL BUILDING_DLL
         )
     endif()
 else()
