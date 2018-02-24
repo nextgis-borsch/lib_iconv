@@ -21,6 +21,7 @@ po,po,skip,
 preload,preload,skip,
 src,src,,"c,h"
 srclib,srclib,,h
+srclib/uniwidth,srclib/uniwidth,,h
 srcm4,srcm4,skip,
 tests,tests,,*
 tools,tools,skip,
