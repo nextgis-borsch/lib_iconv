@@ -131,98 +131,6 @@ else()
     add_library(${LIB_NAME} STATIC ${SRCS} ${PUBLIC_HDRS} ${PRIVATE_HDRS})
 endif()
 
-set(ICRT_SRCS
-    srclib/allocator.c a
-    srclib/readlink.c
-    srclib/binary-io.c
-    srclib/careadlinkat.c
-    srclib/dirname-lgpl.c
-    srclib/basename-lgpl.c
-    srclib/stripslash.c
-    srclib/getprogname.c
-    srclib/malloca.c
-    srclib/progname.c
-    srclib/safe-read.c
-    srclib/unistd.c
-    srclib/uniwidth/width.c
-    srclib/xmalloc.c
-    srclib/xstrdup.c
-    srclib/xreadlink.c
-)
-
-add_library(icrt STATIC ${ICRT_SRCS})
-
-# add app
-set(APP_SRCS
-    src/iconv.c
-)
-
-if(WIN32)
-    set(APP_SRCS ${APP_SRCS}
-        windows/iconv.rc
-    )
-endif()
-
-add_executable(iconv ${APP_SRCS})
-target_link_libraries(iconv ${LIB_NAME} icrt)
-
-set(APP_NO_SRCS
-    src/iconv_no_i18n.c
-)
-
-if(WIN32)
-    set(APP_NO_SRCS ${APP_NO_SRCS}
-        windows/iconv.rc
-    )
-endif()
-
-add_executable(iconv_no_i18n ${APP_NO_SRCS})
-target_link_libraries(iconv_no_i18n ${LIB_NAME} icrt)
-
-# add test
-enable_testing()
-if(BUILD_TESTING)
-    set(STATEFUL_SRCS
-        UCS-2BE
-        UCS-2LE
-        UCS-4BE
-        UCS-4LE
-        UTF-16
-        UTF-16BE
-        UTF-16LE
-        UTF-32
-        UTF-32BE
-        UTF-32LE
-        UTF-7
-        CP1255
-        CP1258
-        TCVN
-        ISO-2022-JP
-        ISO-2022-JP-2
-        ISO-2022-JP-1
-        ISO-2022-JP-MS
-        ISO-2022-CN
-        ISO-2022-CN-EXT
-        HZ
-        ISO-2022-KR
-    )
-
-    foreach(ENC STATEFUL_SRCS)
-        add_test(NAME iconv_no_i18n_${ENC}
-                 COMMAND ${CMAKE_COMMAND}
-                 -DTEST_APP=$<TARGET_FILE:iconv_no_i18n>
-                 -DTEST_ARG1=${ENC}
-                 -DTEST_NAME=iconv_no_i18n_${ENC}
-                 -DTEST_COMPARE1=${CMAKE_CURRENT_SOURCE_DIR}/tests/${ENC}-snippet
-                 -DTEST_COMPARE2=${CMAKE_CURRENT_SOURCE_DIR}/tests/${ENC}-snippet.UTF-8
-                 -DTEST_COMPARE3=${CMAKE_CURRENT_BINARY_DIR}/${ENC}-snippet.UTF-8
-                 -P ${CMAKE_SOURCE_DIR}/cmake/TestCompareFiles.cmake)
-    endforeach()
-
-    add_test(iconv_1 iconv --version)
-    add_test(iconv_no_i18n_1 iconv_no_i18n --version)
-endif()
-
 set(PACKAGE_NAME ${PROJECT_NAME})
 string(TOUPPER ${PACKAGE_NAME} PACKAGE_UPPER_NAME)
 
@@ -246,12 +154,16 @@ if(NOT SKIP_INSTALL_HEADERS AND NOT SKIP_INSTALL_ALL )
     install(FILES ${PUBLIC_HDRS} DESTINATION "${INSTALL_INC_DIR}")
 endif()
 
-if(NOT SKIP_INSTALL_EXECUTABLES AND NOT SKIP_INSTALL_ALL)
-    install(TARGETS iconv DESTINATION ${INSTALL_BIN_DIR} COMPONENT applications)
-endif()
 if(NOT SKIP_INSTALL_DOCS AND NOT SKIP_INSTALL_ALL)
     install(FILES man/iconv.1 DESTINATION ${INSTALL_MAN_DIR}/man1)
-    install(DIRECTORY man DESTINATION ${INSTALL_MAN_DIR}/man3 PATTERN "*.3")
+    set(MAN_3
+        man/iconv.3
+        man/iconv_close.3
+        man/iconv_open.3
+        man/iconv_open_intro.3
+        man/iconvctl.3
+    )
+    install(FILES ${MAN_3} DESTINATION ${INSTALL_MAN_DIR}/man3)
 endif()
 
 add_custom_target(uninstall COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake)
