@@ -527,7 +527,7 @@ configure_file ( libcharset/include/libcharset.h.in ${CMAKE_CURRENT_BINARY_DIR}/
 file(READ "libcharset/include/localcharset.h.build.in" _LOCALCHARSET_H_CONTENTS)
 string(REPLACE
     "#if @HAVE_VISIBILITY@ && BUILDING_LIBCHARSET
-#define LIBCHARSET_DLL_EXPORTED __attribute__((__visibility__("default")))
+#define LIBCHARSET_DLL_EXPORTED __attribute__((__visibility__(\"default\")))
 #else
 #define LIBCHARSET_DLL_EXPORTED
 #endif"
