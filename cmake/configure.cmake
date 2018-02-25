@@ -498,6 +498,11 @@ endif()
 configure_file(${CMAKE_SOURCE_DIR}/cmake/config.h.in ${CMAKE_CURRENT_BINARY_DIR}/config.h IMMEDIATE @ONLY)
 add_definitions(-DHAVE_CONFIG_H)
 
+if(POLICY CMP0053)
+  cmake_policy(PUSH)
+  cmake_policy(SET CMP0053 NEW)
+endif()
+
 unset(DLL_VARIABLE)
 file(READ "include/iconv.h.build.in" _ICONV_H_CONTENTS)
 string(REPLACE
@@ -536,5 +541,9 @@ string(REPLACE
     ${_LOCALCHARSET_H_CONTENTS})
 file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/localcharset.h.in ${_LOCALCHARSET_H_CONTENTS})
 configure_file ( libcharset/include/localcharset.h.build.in ${CMAKE_CURRENT_BINARY_DIR}/include/localcharset.h IMMEDIATE @ONLY)
-configure_file ( srclib/uniwidth.in.h ${CMAKE_CURRENT_BINARY_DIR}/uniwidth.h IMMEDIATE @ONLY)
-configure_file ( srclib/unitypes.in.h ${CMAKE_CURRENT_BINARY_DIR}/unitypes.h IMMEDIATE @ONLY)
+# configure_file ( srclib/uniwidth.in.h ${CMAKE_CURRENT_BINARY_DIR}/uniwidth.h IMMEDIATE @ONLY)
+# configure_file ( srclib/unitypes.in.h ${CMAKE_CURRENT_BINARY_DIR}/unitypes.h IMMEDIATE @ONLY)
+
+if(POLICY CMP0053)
+  cmake_policy(POP)
+endif()

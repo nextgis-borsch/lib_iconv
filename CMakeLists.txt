@@ -160,7 +160,7 @@ if(NOT SKIP_INSTALL_DOCS AND NOT SKIP_INSTALL_ALL)
         man/iconv.3
         man/iconv_close.3
         man/iconv_open.3
-        man/iconv_open_intro.3
+        man/iconv_open_into.3
         man/iconvctl.3
     )
     install(FILES ${MAN_3} DESTINATION ${INSTALL_MAN_DIR}/man3)
