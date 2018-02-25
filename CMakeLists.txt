@@ -131,6 +131,27 @@ else()
     add_library(${LIB_NAME} STATIC ${SRCS} ${PUBLIC_HDRS} ${PRIVATE_HDRS})
 endif()
 
+set(ICRT_SRCS
+    srclib/allocator.c a
+    srclib/readlink.c
+    srclib/binary-io.c
+    srclib/careadlinkat.c
+    srclib/dirname-lgpl.c
+    srclib/basename-lgpl.c
+    srclib/stripslash.c
+    srclib/getprogname.c
+    srclib/malloca.c
+    srclib/progname.c
+    srclib/safe-read.c
+    srclib/unistd.c
+    srclib/uniwidth/width.c
+    srclib/xmalloc.c
+    srclib/xstrdup.c
+    srclib/xreadlink.c
+)
+
+add_library(icrt STATIC ${ICRT_SRCS})
+
 # add app
 set(APP_SRCS
     src/iconv.c
@@ -143,7 +164,7 @@ if(WIN32)
 endif()
 
 add_executable(iconv ${APP_SRCS})
-target_link_libraries(iconv ${LIB_NAME})
+target_link_libraries(iconv ${LIB_NAME} icrt)
 
 set(APP_NO_SRCS
     src/iconv_no_i18n.c
@@ -156,7 +177,7 @@ if(WIN32)
 endif()
 
 add_executable(iconv_no_i18n ${APP_NO_SRCS})
-target_link_libraries(iconv_no_i18n ${LIB_NAME})
+target_link_libraries(iconv_no_i18n ${LIB_NAME} icrt)
 
 # add test
 enable_testing()
@@ -226,7 +247,7 @@ if(NOT SKIP_INSTALL_HEADERS AND NOT SKIP_INSTALL_ALL )
 endif()
 
 if(NOT SKIP_INSTALL_EXECUTABLES AND NOT SKIP_INSTALL_ALL)
-    install(TARGETS iconv iconv_no_i18n DESTINATION ${INSTALL_BIN_DIR} COMPONENT applications)
+    install(TARGETS iconv DESTINATION ${INSTALL_BIN_DIR} COMPONENT applications)
 endif()
 if(NOT SKIP_INSTALL_DOCS AND NOT SKIP_INSTALL_ALL)
     install(FILES man/iconv.1 DESTINATION ${INSTALL_MAN_DIR}/man1)

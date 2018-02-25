@@ -20,8 +20,8 @@ os2,os2,,def
 po,po,skip,
 preload,preload,skip,
 src,src,,"c,h"
-srclib,srclib,,h
-srclib/uniwidth,srclib/uniwidth,,h
+srclib,srclib,,"h,c"
+srclib/uniwidth,srclib/uniwidth,,"h,c"
 srcm4,srcm4,skip,
 tests,tests,,*
 tools,tools,skip,
