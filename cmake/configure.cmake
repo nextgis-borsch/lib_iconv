@@ -518,8 +518,8 @@ string(REPLACE
 #endif //     BUILDING_LIBICONV
     "
     _ICONV_H_CONTENTS
-    ${_ICONV_H_CONTENTS})
-file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/iconv.h.in ${_ICONV_H_CONTENTS})
+    "${_ICONV_H_CONTENTS}")
+file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/iconv.h.in "${_ICONV_H_CONTENTS}")
 configure_file ( ${CMAKE_CURRENT_BINARY_DIR}/iconv.h.in ${CMAKE_CURRENT_BINARY_DIR}/include/iconv.h IMMEDIATE @ONLY)
 
 configure_file ( libcharset/include/libcharset.h.in ${CMAKE_CURRENT_BINARY_DIR}/include/libcharset.h IMMEDIATE @ONLY)
@@ -538,8 +538,8 @@ string(REPLACE
 #endif //     BUILDING_LIBICONV
     "
     _LOCALCHARSET_H_CONTENTS
-    ${_LOCALCHARSET_H_CONTENTS})
-file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/localcharset.h.in ${_LOCALCHARSET_H_CONTENTS})
+    "${_LOCALCHARSET_H_CONTENTS}")
+file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/localcharset.h.in "${_LOCALCHARSET_H_CONTENTS}")
 configure_file ( libcharset/include/localcharset.h.build.in ${CMAKE_CURRENT_BINARY_DIR}/include/localcharset.h IMMEDIATE @ONLY)
 # configure_file ( srclib/uniwidth.in.h ${CMAKE_CURRENT_BINARY_DIR}/uniwidth.h IMMEDIATE @ONLY)
 # configure_file ( srclib/unitypes.in.h ${CMAKE_CURRENT_BINARY_DIR}/unitypes.h IMMEDIATE @ONLY)
