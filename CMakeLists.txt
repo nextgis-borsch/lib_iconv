@@ -113,7 +113,7 @@ endif()
 
 report_version(${PROJECT_NAME} ${VERSION})
 
-set(LIB_NAME lib${PROJECT_NAME})
+set(LIB_NAME ${PROJECT_NAME})
 if(BUILD_SHARED_LIBS)
     add_library(${LIB_NAME} SHARED ${SRCS} ${PUBLIC_HDRS} ${PRIVATE_HDRS})
     set_target_properties(${LIB_NAME} PROPERTIES
