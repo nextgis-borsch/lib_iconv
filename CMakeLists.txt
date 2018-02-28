@@ -133,6 +133,11 @@ endif()
 
 set(PACKAGE_NAME ${PROJECT_NAME})
 string(TOUPPER ${PACKAGE_NAME} PACKAGE_UPPER_NAME)
+if(ICONV_CONST MATCHES "const")
+    set(SECOND_ARGUMENT_IS_CONST TRUE)
+else()
+    set(SECOND_ARGUMENT_IS_CONST FALSE)
+endif()
 
 if(WIN32)
     # On unix-like platforms the library is almost always called lib${PROJECT_NAME}
