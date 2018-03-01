@@ -522,6 +522,8 @@ string(REPLACE
 file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/iconv.h.in "${_ICONV_H_CONTENTS}")
 configure_file ( ${CMAKE_CURRENT_BINARY_DIR}/iconv.h.in ${CMAKE_CURRENT_BINARY_DIR}/include/iconv.h IMMEDIATE @ONLY)
 
+configure_file ( libcharset/include/libcharset.h.in ${CMAKE_CURRENT_BINARY_DIR}/include/libcharset.h IMMEDIATE @ONLY)
+
 file(READ "libcharset/include/localcharset.h.build.in" _LOCALCHARSET_H_CONTENTS)
 string(REPLACE
     "#if @HAVE_VISIBILITY@ && BUILDING_LIBCHARSET
