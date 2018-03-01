@@ -522,8 +522,6 @@ string(REPLACE
 file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/iconv.h.in "${_ICONV_H_CONTENTS}")
 configure_file ( ${CMAKE_CURRENT_BINARY_DIR}/iconv.h.in ${CMAKE_CURRENT_BINARY_DIR}/include/iconv.h IMMEDIATE @ONLY)
 
-configure_file ( libcharset/include/libcharset.h.in ${CMAKE_CURRENT_BINARY_DIR}/include/libcharset.h IMMEDIATE @ONLY)
-
 file(READ "libcharset/include/localcharset.h.build.in" _LOCALCHARSET_H_CONTENTS)
 string(REPLACE
     "#if @HAVE_VISIBILITY@ && BUILDING_LIBCHARSET
@@ -540,7 +538,7 @@ string(REPLACE
     _LOCALCHARSET_H_CONTENTS
     "${_LOCALCHARSET_H_CONTENTS}")
 file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/localcharset.h.in "${_LOCALCHARSET_H_CONTENTS}")
-configure_file ( libcharset/include/localcharset.h.build.in ${CMAKE_CURRENT_BINARY_DIR}/include/localcharset.h IMMEDIATE @ONLY)
+configure_file ( ${CMAKE_CURRENT_BINARY_DIR}/localcharset.h.in ${CMAKE_CURRENT_BINARY_DIR}/include/localcharset.h IMMEDIATE @ONLY)
 # configure_file ( srclib/uniwidth.in.h ${CMAKE_CURRENT_BINARY_DIR}/uniwidth.h IMMEDIATE @ONLY)
 # configure_file ( srclib/unitypes.in.h ${CMAKE_CURRENT_BINARY_DIR}/unitypes.h IMMEDIATE @ONLY)
 
