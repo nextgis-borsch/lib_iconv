@@ -73,12 +73,12 @@ endif()
 
 set(PUBLIC_HDRS
     ${CMAKE_CURRENT_BINARY_DIR}/include/iconv.h
+    ${CMAKE_CURRENT_BINARY_DIR}/include/localcharset.h
 )
 
 set(PRIVATE_HDRS
     ${CMAKE_CURRENT_BINARY_DIR}/config.h
     ${CMAKE_CURRENT_BINARY_DIR}/include/libcharset.h
-    ${CMAKE_CURRENT_BINARY_DIR}/include/localcharset.h
     libcharset/lib/relocatable.h
 )
 
