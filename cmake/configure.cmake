@@ -1,9 +1,9 @@
 ################################################################################
-# Project:  Lib LZMA
+# Project:  Lib iconv
 # Purpose:  CMake build scripts
 # Author:   Dmitry Baryshnikov, dmitry.baryshnikov@nexgis.com
 ################################################################################
-# Copyright (C) 2015, NextGIS <info@nextgis.com>
+# Copyright (C) 2015-2018, NextGIS <info@nextgis.com>
 #
 # Permission is hereby granted, free of charge, to any person obtaining a
 # copy of this software and associated documentation files (the "Software"),
@@ -261,7 +261,7 @@ check_c_source_compiles("
     }
     " HAVE_VISIBILITY)
 
-if(NOT HAVE_VISIBILITY)
+if(NOT HAVE_VISIBILITY OR BUILD_STATIC_LIBS)
     set(HAVE_VISIBILITY 0)
 endif()
 
@@ -410,12 +410,19 @@ set(PACKAGE_STRING "${PACKAGE_NAME} ${PACKAGE_VERSION}")
 
 if(APPLE)
     set(DLL_VARIABLE "__declspec(export)")
+    set(DLL_IMPORT_VARIABLE "__declspec(import)")
 elseif(WIN32)
     set(DLL_VARIABLE "__declspec(dllexport)")
+    set(DLL_IMPORT_VARIABLE "__declspec(dllimport)")
 elseif(HAVE_VISIBILITY)
     set(DLL_VARIABLE "__attribute__((__visibility__(\"default\")))")
+    set(DLL_IMPORT_VARIABLE "__attribute__((__visibility__(\"default\")))")
+elseif(BUILD_STATIC_LIBS)
+    set(DLL_VARIABLE)
+    set(DLL_IMPORT_VARIABLE)
 else()
     set(DLL_VARIABLE "__attribute__((dllexport))")
+    set(DLL_IMPORT_VARIABLE "__attribute__((dllimport))")
 endif()
 
 file(WRITE "${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/CMakeTmp/src.c"
@@ -503,7 +510,6 @@ if(POLICY CMP0053)
   cmake_policy(SET CMP0053 NEW)
 endif()
 
-unset(DLL_VARIABLE)
 file(READ "include/iconv.h.build.in" _ICONV_H_CONTENTS)
 string(REPLACE
     "#if @HAVE_VISIBILITY@ && BUILDING_LIBICONV
@@ -512,9 +518,9 @@ string(REPLACE
 #define LIBICONV_DLL_EXPORTED
 #endif"
     "#if BUILDING_LIBICONV
-#define LIBICONV_DLL_EXPORTED __declspec(dllexport)
+#define LIBICONV_DLL_EXPORTED ${DLL_VARIABLE}
 #else
-#define LIBICONV_DLL_EXPORTED __declspec(dllimport)
+#define LIBICONV_DLL_EXPORTED ${DLL_IMPORT_VARIABLE}
 #endif //     BUILDING_LIBICONV
     "
     _ICONV_H_CONTENTS
@@ -532,9 +538,9 @@ string(REPLACE
 #define LIBCHARSET_DLL_EXPORTED
 #endif"
     "#if BUILDING_LIBICONV
-#define LIBCHARSET_DLL_EXPORTED __declspec(dllexport)
+#define LIBCHARSET_DLL_EXPORTED ${DLL_VARIABLE}
 #else
-#define LIBCHARSET_DLL_EXPORTED __declspec(dllimport)
+#define LIBCHARSET_DLL_EXPORTED ${DLL_IMPORT_VARIABLE}
 #endif //     BUILDING_LIBICONV
     "
     _LOCALCHARSET_H_CONTENTS
