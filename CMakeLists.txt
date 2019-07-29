@@ -49,6 +49,8 @@ set(INSTALL_INC_DIR ${CMAKE_INSTALL_INCLUDEDIR} CACHE INTERNAL "Installation dir
 set(INSTALL_MAN_DIR ${CMAKE_INSTALL_MANDIR} CACHE INTERNAL "Installation directory for manual pages" FORCE)
 set(INSTALL_CMAKECONF_DIR ${CMAKE_INSTALL_DATADIR}/${PROJECT_NAME}/CMake CACHE INTERNAL "Installation directory for cmake config files" FORCE)
 
+set(PACKAGE_NAME ${PROJECT_NAME})
+
 include(util)
 
 check_version(ICONV_MAJOR_VERSION ICONV_MINOR_VERSION)
@@ -79,13 +81,12 @@ set(PUBLIC_HDRS
 set(PRIVATE_HDRS
     ${CMAKE_CURRENT_BINARY_DIR}/config.h
     ${CMAKE_CURRENT_BINARY_DIR}/include/libcharset.h
-    libcharset/lib/relocatable.h
 )
 
 set(SRCS
     lib/iconv.c
     libcharset/lib/localcharset.c
-    libcharset/lib/relocatable.c
+    libcharset/lib/relocatable-stub.c
 )
 
 if(WIN32)
@@ -131,7 +132,6 @@ else()
     add_library(${LIB_NAME} STATIC ${SRCS} ${PUBLIC_HDRS} ${PRIVATE_HDRS})
 endif()
 
-set(PACKAGE_NAME ${PROJECT_NAME})
 string(TOUPPER ${PACKAGE_NAME} PACKAGE_UPPER_NAME)
 if(ICONV_CONST MATCHES "const")
     set(SECOND_ARGUMENT_IS_CONST TRUE)

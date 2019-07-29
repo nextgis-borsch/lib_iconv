@@ -404,7 +404,7 @@ check_type_size(size_t SIZE_T)
 check_type_size(ssize_t SSIZE_T)
 
 set(PACKAGE ${PROJECT_NAME})
-set(PACKAGE_NAME "lib${PACKAGE}")
+# set(PACKAGE_NAME "lib${PACKAGE}")
 set(PACKAGE_VERSION ${VERSION})
 set(PACKAGE_STRING "${PACKAGE_NAME} ${PACKAGE_VERSION}")
 
