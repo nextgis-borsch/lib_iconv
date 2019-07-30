@@ -19,8 +19,8 @@
 
 #include "libcharset.h"
 
-extern LIBCHARSET_DLL_EXPORTED void
-libcharset_set_relocation_prefix (const char *orig_prefix, const char *curr_prefix);
+// extern LIBCHARSET_DLL_EXPORTED void
+// libcharset_set_relocation_prefix (const char *orig_prefix, const char *curr_prefix);
 
 /* This is a stub for binary backward-compatibility.  */
 void
