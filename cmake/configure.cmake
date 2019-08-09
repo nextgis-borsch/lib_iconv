@@ -403,28 +403,6 @@ endforeach()
 check_type_size(size_t SIZE_T)
 check_type_size(ssize_t SSIZE_T)
 
-set(PACKAGE ${PROJECT_NAME})
-# set(PACKAGE_NAME "lib${PACKAGE}")
-set(PACKAGE_VERSION ${VERSION})
-set(PACKAGE_STRING "${PACKAGE_NAME} ${PACKAGE_VERSION}")
-
-if(APPLE)
-    set(DLL_VARIABLE "__declspec(export)")
-    set(DLL_IMPORT_VARIABLE "__declspec(import)")
-elseif(WIN32)
-    set(DLL_VARIABLE "__declspec(dllexport)")
-    set(DLL_IMPORT_VARIABLE "__declspec(dllimport)")
-elseif(HAVE_VISIBILITY)
-    set(DLL_VARIABLE "__attribute__((__visibility__(\"default\")))")
-    set(DLL_IMPORT_VARIABLE "__attribute__((__visibility__(\"default\")))")
-elseif(BUILD_STATIC_LIBS)
-    set(DLL_VARIABLE)
-    set(DLL_IMPORT_VARIABLE)
-else()
-    set(DLL_VARIABLE "__attribute__((dllexport))")
-    set(DLL_IMPORT_VARIABLE "__attribute__((dllimport))")
-endif()
-
 file(WRITE "${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/CMakeTmp/src.c"
       "#include <sys/types.h>
            #include <sys/stat.h>
@@ -510,45 +488,72 @@ if(POLICY CMP0053)
   cmake_policy(SET CMP0053 NEW)
 endif()
 
-file(READ "include/iconv.h.build.in" _ICONV_H_CONTENTS)
-string(REPLACE
-    "#if @HAVE_VISIBILITY@ && BUILDING_LIBICONV
-#define LIBICONV_DLL_EXPORTED __attribute__((__visibility__(\"default\")))
-#else
-#define LIBICONV_DLL_EXPORTED
-#endif"
-    "#if BUILDING_LIBICONV
-#define LIBICONV_DLL_EXPORTED ${DLL_VARIABLE}
-#else
-#define LIBICONV_DLL_EXPORTED ${DLL_IMPORT_VARIABLE}
-#endif //     BUILDING_LIBICONV
-    "
-    _ICONV_H_CONTENTS
-    "${_ICONV_H_CONTENTS}")
-file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/iconv.h.in "${_ICONV_H_CONTENTS}")
-configure_file ( ${CMAKE_CURRENT_BINARY_DIR}/iconv.h.in ${CMAKE_CURRENT_BINARY_DIR}/include/iconv.h IMMEDIATE @ONLY)
+set(PACKAGE ${PROJECT_NAME})
+# set(PACKAGE_NAME "lib${PACKAGE}")
+set(PACKAGE_VERSION ${VERSION})
+set(PACKAGE_STRING "${PACKAGE_NAME} ${PACKAGE_VERSION}")
 
-configure_file ( libcharset/include/libcharset.h.in ${CMAKE_CURRENT_BINARY_DIR}/include/libcharset.h IMMEDIATE @ONLY)
+# if(APPLE)
+#     set(DLL_EXPORT_VARIABLE "__declspec(export)")
+#     set(DLL_IMPORT_VARIABLE "__declspec(import)")
+# elseif(WIN32)
+#     set(DLL_EXPORT_VARIABLE "__declspec(dllexport)")
+#     set(DLL_IMPORT_VARIABLE "__declspec(dllimport)")
+# elseif(HAVE_VISIBILITY)
+#     set(DLL_EXPORT_VARIABLE "__attribute__((__visibility__(\"default\")))")
+#     set(DLL_IMPORT_VARIABLE "__attribute__((__visibility__(\"default\")))")
+# elseif(BUILD_STATIC_LIBS)
+#     set(DLL_EXPORT_VARIABLE)
+#     set(DLL_IMPORT_VARIABLE)
+# else()
+#     set(DLL_EXPORT_VARIABLE "__attribute__((dllexport))")
+#     set(DLL_IMPORT_VARIABLE "__attribute__((dllimport))")
+# endif()
 
-file(READ "libcharset/include/localcharset.h.build.in" _LOCALCHARSET_H_CONTENTS)
-string(REPLACE
-    "#if @HAVE_VISIBILITY@ && BUILDING_LIBCHARSET
-#define LIBCHARSET_DLL_EXPORTED __attribute__((__visibility__(\"default\")))
-#else
-#define LIBCHARSET_DLL_EXPORTED
-#endif"
-    "#if BUILDING_LIBICONV
-#define LIBCHARSET_DLL_EXPORTED ${DLL_VARIABLE}
-#else
-#define LIBCHARSET_DLL_EXPORTED ${DLL_IMPORT_VARIABLE}
-#endif //     BUILDING_LIBICONV
-    "
-    _LOCALCHARSET_H_CONTENTS
-    "${_LOCALCHARSET_H_CONTENTS}")
-file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/localcharset.h.in "${_LOCALCHARSET_H_CONTENTS}")
-configure_file ( ${CMAKE_CURRENT_BINARY_DIR}/localcharset.h.in ${CMAKE_CURRENT_BINARY_DIR}/include/localcharset.h IMMEDIATE @ONLY)
+# file(READ "include/iconv.h.build.in" _ICONV_H_CONTENTS)
+# string(REPLACE
+#     "#if @HAVE_VISIBILITY@ && BUILDING_LIBICONV
+# #define LIBICONV_DLL_EXPORTED __attribute__((__visibility__("default")))
+# #elif defined _MSC_VER && BUILDING_LIBICONV
+# #define LIBICONV_DLL_EXPORTED __declspec(dllexport)
+# #else
+# #define LIBICONV_DLL_EXPORTED
+# #endif"
+#     "#if BUILDING_LIBICONV
+# #define LIBICONV_DLL_EXPORTED ${DLL_EXPORT_VARIABLE}
+# #else
+# #define LIBICONV_DLL_EXPORTED ${DLL_IMPORT_VARIABLE}
+# #endif //     BUILDING_LIBICONV
+#     "
+#     _ICONV_H_CONTENTS
+#     "${_ICONV_H_CONTENTS}")
+# file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/iconv.h.in "${_ICONV_H_CONTENTS}")
+# configure_file ( ${CMAKE_CURRENT_BINARY_DIR}/iconv.h.in ${CMAKE_CURRENT_BINARY_DIR}/include/iconv.h IMMEDIATE @ONLY)
+
+
+# file(READ "libcharset/include/localcharset.h.build.in" _LOCALCHARSET_H_CONTENTS)
+# string(REPLACE
+#     "#if @HAVE_VISIBILITY@ && BUILDING_LIBCHARSET
+# #define LIBCHARSET_DLL_EXPORTED __attribute__((__visibility__(\"default\")))
+# #else
+# #define LIBCHARSET_DLL_EXPORTED
+# #endif"
+#     "#if BUILDING_LIBICONV
+# #define LIBCHARSET_DLL_EXPORTED ${DLL_EXPORT_VARIABLE}
+# #else
+# #define LIBCHARSET_DLL_EXPORTED ${DLL_IMPORT_VARIABLE}
+# #endif //     BUILDING_LIBICONV
+#     "
+#     _LOCALCHARSET_H_CONTENTS
+#     "${_LOCALCHARSET_H_CONTENTS}")
+# file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/localcharset.h.in "${_LOCALCHARSET_H_CONTENTS}")
+# configure_file ( ${CMAKE_CURRENT_BINARY_DIR}/localcharset.h.in ${CMAKE_CURRENT_BINARY_DIR}/include/localcharset.h IMMEDIATE @ONLY)
 # configure_file ( srclib/uniwidth.in.h ${CMAKE_CURRENT_BINARY_DIR}/uniwidth.h IMMEDIATE @ONLY)
 # configure_file ( srclib/unitypes.in.h ${CMAKE_CURRENT_BINARY_DIR}/unitypes.h IMMEDIATE @ONLY)
+
+configure_file ( ${CMAKE_CURRENT_BINARY_DIR}/iconv.h.build.in ${CMAKE_CURRENT_BINARY_DIR}/include/iconv.h IMMEDIATE @ONLY)
+configure_file ( libcharset/include/libcharset.h.in ${CMAKE_CURRENT_BINARY_DIR}/include/libcharset.h IMMEDIATE @ONLY)
+configure_file ( ${CMAKE_CURRENT_BINARY_DIR}/localcharset.h.build.in ${CMAKE_CURRENT_BINARY_DIR}/include/localcharset.h IMMEDIATE @ONLY)
 
 if(POLICY CMP0053)
   cmake_policy(POP)
